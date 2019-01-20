@@ -1,0 +1,19 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+build:
+  artifacts:
+    - image: postgres:11.1-alpine
+      context: src/bar-au-db
+      docker:
+        dockerfile: DockerFile
+deploy:
+  kubectl:
+    manifests:
+      - kubernetes-manifests/bar-au-db-service.yaml
+profiles:
+  # "travis-ci" profile is used to build the images withou
+  # pushing them.
+  - name: travis-ci
+    build:
+      local:
+        push: false

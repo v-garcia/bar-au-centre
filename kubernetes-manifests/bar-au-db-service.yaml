@@ -1,0 +1,50 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: bar-au-db
+spec:
+  template:
+    metadata:
+      labels:
+        app: bar-au-db
+  spec:
+    containers:
+      - name: postgres
+        image: postgres:11.1-alpine
+        ports:
+          - containerPort: 5432
+        volumeMounts:
+          - name: datadir
+            mountPath: /var/lib/postgresql/data
+            subPath: pgdata
+        env:
+          - name: POSTGRES_USER
+            value: kong
+          - name: POSTGRES_PASSWORD
+            value: kong
+          - name: POSTGRES_DB
+            value: kong
+          - name: PGDATA
+            value: /var/lib/postgresql/data/pgdata
+        # No pre-stop hook is required, a SIGTERM plus some time is all that's
+        # needed for graceful shutdown of a node.
+    terminationGracePeriodSeconds: 60
+    volumes:
+      - name: datadir
+        persistentVolumeClaim:
+          claimName: postgres-vol
+    serviceName: bar-au-db
+    replicas: 1
+    selector:
+      matchLabels:
+        app: bar-au-db
+
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-vol
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
