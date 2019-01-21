@@ -1,50 +1,67 @@
-apiVersion: extensions/v1beta1
-kind: Deployment
+# apiVersion: extensions/v1beta1
+# kind: Deployment
+# metadata:
+apiVersion: v1
+kind: Service
 metadata:
   name: bar-au-db
 spec:
+  type: ClusterIP
+  selector:
+    app: bar-au-db
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: bar-au-db
+spec:
+  serviceName: bar-au-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bar-au-db
   template:
     metadata:
       labels:
         app: bar-au-db
-  spec:
-    containers:
-      - name: postgres
-        image: postgres:11.1-alpine
-        ports:
-          - containerPort: 5432
-        volumeMounts:
-          - name: datadir
-            mountPath: /var/lib/postgresql/data
-            subPath: pgdata
-        env:
-          - name: POSTGRES_USER
-            value: kong
-          - name: POSTGRES_PASSWORD
-            value: kong
-          - name: POSTGRES_DB
-            value: kong
-          - name: PGDATA
-            value: /var/lib/postgresql/data/pgdata
-        # No pre-stop hook is required, a SIGTERM plus some time is all that's
-        # needed for graceful shutdown of a node.
-    terminationGracePeriodSeconds: 60
-    volumes:
-      - name: datadir
-        persistentVolumeClaim:
-          claimName: postgres-vol
-    serviceName: bar-au-db
-    replicas: 1
-    selector:
-      matchLabels:
-        app: bar-au-db
-
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:11.1-alpine
+          ports:
+            - name: postgres
+              containerPort: 5432
+          volumeMounts:
+            - name: postgres-vol
+              mountPath: /var/lib/postgresql/data
+              # subPath: pgdata
+          env:
+            - name: POSTGRES_USER
+              value: kong
+            - name: POSTGRES_PASSWORD
+              value: kong
+            - name: POSTGRES_DB
+              value: kong
+            - name: PGDATA
+              value: /var/lib/postgresql/data
+              #value: /var/lib/postgresql/data/pgdata
+      # No pre-stop hook is required, a SIGTERM plus some time is all that's
+      # needed for graceful shutdown of a node.
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - name: postgres-vol
+          persistentVolumeClaim:
+            claimName: postgres-vol
   volumeClaimTemplates:
     - metadata:
         name: postgres-vol
       spec:
         accessModes:
-          - ReadWriteOnce
+          - 'ReadWriteOnce'
         resources:
           requests:
             storage: 1Gi

@@ -2,10 +2,12 @@ apiVersion: skaffold/v1beta2
 kind: Config
 build:
   artifacts:
-    - image: postgres:11.1-alpine
+    - image: bar-au-db
       context: src/bar-au-db
       docker:
         dockerfile: DockerFile
+  tagPolicy:
+    gitCommit: {}
 deploy:
   kubectl:
     manifests:
