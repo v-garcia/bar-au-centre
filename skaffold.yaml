@@ -6,12 +6,16 @@ build:
       context: src/bar-au-db
     - image: pgweb
       context: dev-tools/pgweb
+    - image: db-migrate-up
+      context: src/bar-au-db
+      docker: 
+        dockerfile: db-migrate-up.Dockerfile
   tagPolicy:
     gitCommit: {}
 deploy:
   kubectl:
     manifests:
-      - kubernetes-manifests/bar-au-db-service.yaml
+      - kubernetes-manifests/bar-au-db.yaml
       - kubernetes-manifests/pgweb.yaml
       - configs/bar-au-db-config.yaml
 profiles:

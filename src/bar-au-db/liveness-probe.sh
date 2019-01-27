@@ -1,8 +1,6 @@
 
 #!/bin/bash
 
-# From https://github.com/docker-library/healthcheck/blob/master/postgres/docker-healthcheck
-
 set -eo pipefail
 
 host="$(hostname -i || echo '127.0.0.1')"

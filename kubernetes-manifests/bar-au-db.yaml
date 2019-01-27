@@ -50,6 +50,30 @@ spec:
               command: ["bash", "liveness-probe"]
             initialDelaySeconds: 15
             timeoutSeconds: 2
+      initContainers:
+        - name: db-migrate-up
+          image: db-migrate-up
+          volumeMounts:
+          - name: postgres-vol
+            mountPath: /var/lib/postgresql/data/pgdata
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                    name: bar-au-db-config
+                    key: user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                    name: bar-au-db-config
+                    key: password
+            - name: POSTGRES_DB
+              valueFrom: 
+                secretKeyRef:
+                  name: bar-au-db-config
+                  key: db
+            - name: DATABASE_URL
+              value: postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(BAR_AU_DB_SERVICE_PORT)/$(POSTGRES_DB)?sslmode=disable
       # No pre-stop hook is required, a SIGTERM plus some time is all that's
       # needed for graceful shutdown of a node.
       terminationGracePeriodSeconds: 60

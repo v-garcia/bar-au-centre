@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: bar-au-db-config
+type: Opaque
+data:
+  db: YmFjLWRi
+  user: YmFjLXVzcg==
+  password: YmFjLXB3ZA==
+
+#data:
+# db: bac-
