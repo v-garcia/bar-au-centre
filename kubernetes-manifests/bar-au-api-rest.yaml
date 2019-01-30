@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pgweb
+  name: bar-au-api-rest
   labels:
-    service: pgweb
+    service: bar-au-api-rest
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      app: pgweb
+      app: bar-au-api-rest
   template:
     metadata:
       labels:
-        app: pgweb
+        app: bar-au-api-rest
     spec:
       initContainers:
         - name: wait-postgres
@@ -25,11 +25,11 @@ spec:
             - name: WAITFORIT_PORT
               value: $(BAR_AU_DB_SERVICE_PORT)
       containers:
-        - name: pgweb
-          image: pgweb
+        - name: bar-au-api-rest
+          image: bar-au-api-rest
           ports:
-            - name: pgweb
-              containerPort: 8081
+            - name: bar-au-api-rest
+              containerPort: 3000
           env:
             - name: POSTGRES_USER
               valueFrom:
@@ -46,28 +46,32 @@ spec:
                 secretKeyRef:
                   name: bar-au-db-config
                   key: db
-            - name: DATABASE_URL
+            - name: PGRST_DB_URI
               value: postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(BAR_AU_DB_SERVICE_HOST):$(BAR_AU_DB_SERVICE_PORT)/$(POSTGRES_DB)?sslmode=disable
+            - name: PGRST_DB_SCHEMA
+              value: public
+            - name: PGRST_DB_ANON_ROLE
+              value: anon
           livenessProbe:
             httpGet:
               path: /
-              port: 8081
+              port: bar-au-api-rest
               scheme: HTTP
           readinessProbe:
             httpGet:
               path: /
-              port: 8081
+              port: bar-au-api-rest
               scheme: HTTP
 --- 
 apiVersion: v1
 kind: Service
 metadata:
-  name: pgweb
+  name: bar-au-api-rest
 spec:
   type: ClusterIP
   ports:
-  - port: 8081
+  - port: 3000
     protocol: TCP
-    targetPort: pgweb
+    targetPort: bar-au-api-rest
   selector:
-    app: pgweb
+    app: bar-au-api-rest

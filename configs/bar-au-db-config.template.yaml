@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: bar-au-db-config
+type: Opaque
+data:
+  db: CHANGEME
+  user: CHANGEME
+  password: CHANGEME
+
+# Warning all values here must be b64 encoded
+# See: https://kubernetes.io/docs/concepts/configuration/secret/

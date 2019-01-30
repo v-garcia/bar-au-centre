@@ -6,10 +6,8 @@ build:
       context: src/bar-au-db
     - image: pgweb
       context: dev-tools/pgweb
-    - image: db-migrate-up
-      context: src/bar-au-db
-      docker: 
-        dockerfile: db-migrate-up.Dockerfile
+    - image: bar-au-api-rest
+      context: src/bar-au-api-rest
   tagPolicy:
     gitCommit: {}
 deploy:
@@ -17,6 +15,7 @@ deploy:
     manifests:
       - kubernetes-manifests/bar-au-db.yaml
       - kubernetes-manifests/pgweb.yaml
+      - kubernetes-manifests/bar-au-api-rest.yaml
       - configs/bar-au-db-config.yaml
 profiles:
   # "travis-ci" profile is used to build the images withou

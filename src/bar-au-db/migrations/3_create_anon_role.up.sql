@@ -1,0 +1,6 @@
+CREATE ROLE anon NOINHERIT;
+
+GRANT USAGE ON SCHEMA public TO anon;
+
+GRANT SELECT ON public.bars TO anon;
+
