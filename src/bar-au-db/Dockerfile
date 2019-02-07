@@ -14,13 +14,13 @@ ADD migrations /migrations
 COPY --from=migrate /migrate /usr/local/bin/migrate 
 
 # Add script allow to wait the postgre database to be up
-ADD ./wait-for-postgres.sh /usr/local/bin/wait-for-postgres
+COPY ./wait-for-postgres.sh /usr/local/bin/wait-for-postgres
 RUN chmod +x /usr/local/bin/wait-for-postgres
 
 # Add migrate database script
-ADD ./migrate-up.sh /usr/local/bin/migrate-up
+COPY ./migrate-up.sh /usr/local/bin/migrate-up
 RUN chmod +x /usr/local/bin/migrate-up
 
 # Add liveness probe
-ADD ./liveness-probe.sh /usr/local/bin/liveness-probe
+COPY ./liveness-probe.sh /usr/local/bin/liveness-probe
 RUN chmod +x /usr/local/bin/liveness-probe

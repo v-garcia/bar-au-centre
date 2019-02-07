@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "scripts": {
     "build": "bsb -make-world",
+    "build:prod": "bsb -make-world && NODE_ENV=production webpack",
     "start": "bsb -make-world -w",
     "clean": "bsb -clean-world",
+    "full-clean": "bsb -clean-world && rm -rf build && rm -rf /node_modules",
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack": "webpack -w",
     "webpack:production": "NODE_ENV=production webpack",

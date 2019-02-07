@@ -4,6 +4,6 @@
 .lsp/
 npm-debug.log
 /lib/bs/
+/lib/js/
 /node_modules/
-/src/*.bs.js
 /build/*

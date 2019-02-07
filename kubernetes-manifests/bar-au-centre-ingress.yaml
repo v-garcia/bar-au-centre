@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: bar-au-centre
+  labels:
+    app: bar-au-centre
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: bar-au-centre.dev.fr
+      http:
+        paths:
+        - path: /*
+          backend:
+            serviceName: bar-au-ui
+            servicePort: bar-au-ui
+        - path: /api/*
+          backend:
+            serviceName: bar-au-api-rest
+            servicePort: bar-au-api-rest
+
+
+
+
+# Warning as we use nginx ingress controller, targeting clusterIp service it's ok
+# But it don't work GCE by example (GCE requires targeting nodePort)
+# https://github.com/kubernetes/kubernetes/issues/26508#issuecomment-222376962

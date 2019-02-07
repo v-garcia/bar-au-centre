@@ -8,6 +8,8 @@ build:
       context: dev-tools/pgweb
     - image: bar-au-api-rest
       context: src/bar-au-api-rest
+    - image: bar-au-ui
+      context: src/bar-au-ui
   tagPolicy:
     gitCommit: {}
 deploy:
@@ -16,6 +18,8 @@ deploy:
       - kubernetes-manifests/bar-au-db.yaml
       - kubernetes-manifests/pgweb.yaml
       - kubernetes-manifests/bar-au-api-rest.yaml
+      - kubernetes-manifests/bar-au-ui.yaml
+      - kubernetes-manifests/bar-au-centre-ingress.yaml
       - configs/bar-au-db-config.yaml
 profiles:
   # "travis-ci" profile is used to build the images withou
