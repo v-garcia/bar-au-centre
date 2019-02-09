@@ -20,11 +20,10 @@ deploy:
       - kubernetes-manifests/bar-au-api-rest.yaml
       - kubernetes-manifests/bar-au-ui.yaml
       - kubernetes-manifests/bar-au-centre-ingress.yaml
-      - configs/bar-au-db-config.yaml
+      - configs/*.yaml
 profiles:
-  # "travis-ci" profile is used to build the images withou
-  # pushing them.
-  - name: travis-ci
+  # don't push image to a repo
+  - name: local
     build:
       local:
         push: false

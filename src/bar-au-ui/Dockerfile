@@ -1,20 +1,3 @@
-FROM node:11.9-alpine as builder
-
-WORKDIR /app
-
-COPY . .
-
-# Apparently python is needed by the Ninja build system
-RUN apk add --update \
-    build-base \
-    python
-
-# Install dependencies
-RUN npm install
-
-# Build release
-RUN npm run build:prod
-
 # Build our tiny custom http server
 FROM golang:alpine as gobuilder
 
@@ -25,6 +8,28 @@ WORKDIR /app
 RUN CGO_ENABLED=0 go build -o serve .
 
 RUN ls -al .
+
+# Build ui front-end
+FROM node:11.9-alpine as builder
+
+WORKDIR /app
+
+# Apparently python is needed by the Ninja build system
+RUN apk add --update \
+    build-base \
+    python
+
+# Copy only package.json to use build cache
+COPY ./package.json .
+
+# Install dependencies
+RUN npm install
+
+# Copy everythings now
+COPY . .
+
+# Build release
+RUN npm run build:prod
 
 FROM scratch
 

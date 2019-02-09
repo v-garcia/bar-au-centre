@@ -7,10 +7,15 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/rewrite-target: /
+    ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   rules:
+    # Not parametrizable yet
+    # https://github.com/kubernetes/kubernetes/issues/56795
+    # Current fix consists in registering multiple hosts with YAML ids
+    # Source: https://github.com/kubernetes/kubernetes/issues/43633#issuecomment-362007740
     - host: bar-au-centre.dev.fr
-      http:
+      http: &http_rules
         paths:
         - path: /*
           backend:
@@ -20,10 +25,15 @@ spec:
           backend:
             serviceName: bar-au-api-rest
             servicePort: bar-au-api-rest
-
-
-
-
+    - host: bar-au-centre.local.fr
+      http: *http_rules
+  tls:
+    - hosts:
+      - 'bar-au-centre.dev.fr'
+      secretName: bar-au-centre-tls
+    - hosts:
+      - 'bar-au-centre.local.fr'
+      secretName: bar-au-centre-tls
 # Warning as we use nginx ingress controller, targeting clusterIp service it's ok
 # But it don't work GCE by example (GCE requires targeting nodePort)
 # https://github.com/kubernetes/kubernetes/issues/26508#issuecomment-222376962

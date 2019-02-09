@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  tls.crt: CHANGEME
+  tls.key: CHANGEME
+kind: Secret
+metadata:
+  name: bar-au-centre-tls
+type: kubernetes.io/tlsw
+
+# can be generated with 
+# kubectl create secret tls bar-au-centre-tls --key /tmp/tls.key --cert /tmp/tls.crt --dry-run -o yaml
+# Data are juste b64

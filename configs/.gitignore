@@ -1,3 +1,4 @@
-# Don't version secret templates
-*.
-!*.template.yml
+# Don't version secrets and config (excluding templates)
+*
+/*/
+!/templates/
