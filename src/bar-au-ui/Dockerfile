@@ -7,8 +7,6 @@ WORKDIR /app
 
 RUN CGO_ENABLED=0 go build -o serve .
 
-RUN ls -al .
-
 # Build ui front-end
 FROM node:11.9-alpine as builder
 

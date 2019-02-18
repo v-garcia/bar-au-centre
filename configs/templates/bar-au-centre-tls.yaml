@@ -8,5 +8,6 @@ metadata:
 type: kubernetes.io/tlsw
 
 # can be generated with 
+# openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /tmp/tls.key -out /tmp/tls.crt -subj "/CN=bar-au-centre.dev.fr"
 # kubectl create secret tls bar-au-centre-tls --key /tmp/tls.key --cert /tmp/tls.crt --dry-run -o yaml
 # Data are juste b64
