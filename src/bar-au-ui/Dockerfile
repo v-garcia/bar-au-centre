@@ -18,7 +18,7 @@ RUN apk add --update \
     python
 
 # Copy only package.json to use build cache
-COPY ./package.json .
+COPY ./package.json ./package-lock.json ./
 
 # Install dependencies
 RUN npm install
