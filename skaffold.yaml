@@ -1,29 +1,28 @@
-apiVersion: skaffold/v1beta2
+apiVersion: skaffold/v1beta5
 kind: Config
 build:
   artifacts:
-    - image: bar-au-db
-      context: src/bar-au-db
-    - image: pgweb
-      context: dev-tools/pgweb
-    - image: bar-au-api-rest
-      context: src/bar-au-api-rest
-    - image: bar-au-ui
-      context: src/bar-au-ui
+  - image: bar-au-db
+    context: src/bar-au-db
+  - image: pgweb
+    context: dev-tools/pgweb
+  - image: bar-au-api-rest
+    context: src/bar-au-api-rest
+  - image: bar-au-ui
+    context: src/bar-au-ui
   tagPolicy:
     gitCommit: {}
 deploy:
   kubectl:
     manifests:
-      - kubernetes-manifests/bar-au-db.yaml
-      - kubernetes-manifests/pgweb.yaml
-      - kubernetes-manifests/bar-au-api-rest.yaml
-      - kubernetes-manifests/bar-au-ui.yaml
-      - kubernetes-manifests/bar-au-centre-ingress.yaml
-      - configs/*.yaml
+    - kubernetes-manifests/bar-au-db.yaml
+    - kubernetes-manifests/pgweb.yaml
+    - kubernetes-manifests/bar-au-api-rest.yaml
+    - kubernetes-manifests/bar-au-ui.yaml
+    - kubernetes-manifests/bar-au-centre-ingress.yaml
+    - configs/*.yaml
 profiles:
-  # don't push image to a repo
-  - name: local
-    build:
-      local:
-        push: false
+- name: local
+  build:
+    local:
+      push: false
