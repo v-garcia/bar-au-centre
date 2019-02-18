@@ -69,6 +69,7 @@ spec:
       spec:
         accessModes:
           - 'ReadWriteOnce'
+        # storageClass omitted as we want default
         resources:
           requests:
             storage: 1Gi
