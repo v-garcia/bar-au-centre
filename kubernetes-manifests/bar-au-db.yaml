@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: bar-au-db
+spec:
+  serviceName: bar-au-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bar-au-db
+  template:
+    metadata:
+      labels:
+        app: bar-au-db
+        tier: database
+    spec:
+      containers:
+        - name: postgres
+          image: bar-au-db
+          ports:
+            - name: postgres
+              containerPort: 5432
+          volumeMounts:
+            - name: postgres-vol
+              mountPath: /var/lib/postgresql/data
+              subPath: pgdata
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                    name: bar-au-db-config
+                    key: user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                    name: bar-au-db-config
+                    key: password
+            - name: POSTGRES_DB
+              valueFrom: 
+                secretKeyRef:
+                  name: bar-au-db-config
+                  key: db
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+            - name: DATABASE_URL
+              value: postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(BAR_AU_DB_SERVICE_PORT)/$(POSTGRES_DB)?sslmode=disable
+          lifecycle: 
+            postStart:
+              exec: 
+                command: ["/bin/sh", "-c", "wait-for-postgres && migrate-up"]
+          readinessProbe:
+            # Intrapolation with env vars not work in that case
+            # Better to use an inner file
+            # https://github.com/kubernetes/kubernetes/issues/40846#issuecomment-283127884
+            exec:
+              command: ["bash", "liveness-probe"]
+            initialDelaySeconds: 15
+            timeoutSeconds: 2
+      # No pre-stop hook is required, a SIGTERM plus some time is all that's
+      # needed for graceful shutdown of a node.
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - name: postgres-vol
+          persistentVolumeClaim:
+            claimName: postgres-vol
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-vol
+      spec:
+        accessModes:
+          - 'ReadWriteOnce'
+        # storageClass omitted as we want default
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bar-au-db
+spec:
+  type: ClusterIP
+  selector:
+    app: bar-au-db
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres

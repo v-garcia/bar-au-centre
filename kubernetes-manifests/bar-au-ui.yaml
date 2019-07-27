@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bar-au-ui
+  labels:
+    service: bar-au-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bar-au-ui
+  template:
+    metadata:
+      labels:
+        app: bar-au-ui
+    spec:
+      containers:
+        - name: bar-au-ui
+          image: bar-au-ui
+          ports:
+            - name: bar-au-ui
+              containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: bar-au-ui
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: bar-au-ui
+  selector:
+    app: bar-au-ui

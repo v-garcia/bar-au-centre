@@ -1,0 +1,4 @@
+# Don't version secrets and config (excluding templates)
+*
+/*/
+!/templates/

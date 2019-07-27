@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgweb
+  labels:
+    service: pgweb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgweb
+  template:
+    metadata:
+      labels:
+        app: pgweb
+    spec:
+      initContainers:
+        - name: wait-postgres
+          image: lqhl/wait-for-it
+          env:
+            - name: WAITFORIT_TIMEOUT
+              value: '30'
+            - name: WAITFORIT_HOST
+              value: $(BAR_AU_DB_SERVICE_HOST)
+            - name: WAITFORIT_PORT
+              value: $(BAR_AU_DB_SERVICE_PORT)
+      containers:
+        - name: pgweb
+          image: pgweb
+          ports:
+            - name: pgweb
+              containerPort: 8081
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                    name: bar-au-db-config
+                    key: user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                    name: bar-au-db-config
+                    key: password
+            - name: POSTGRES_DB
+              valueFrom: 
+                secretKeyRef:
+                  name: bar-au-db-config
+                  key: db
+            - name: DATABASE_URL
+              value: postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(BAR_AU_DB_SERVICE_HOST):$(BAR_AU_DB_SERVICE_PORT)/$(POSTGRES_DB)?sslmode=disable
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8081
+              scheme: HTTP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8081
+              scheme: HTTP
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgweb
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8081
+    protocol: TCP
+    targetPort: pgweb
+  selector:
+    app: pgweb
